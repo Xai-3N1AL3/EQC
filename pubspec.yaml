@@ -1,0 +1,30 @@
+name: ecq
+description: A new Flutter meme app project.
+publish_to: "none" # Remove this if publishing to pub.dev
+
+version: 1.0.0+1
+
+environment:
+  sdk: ">=3.3.0 <4.0.0"
+
+dependencies:
+  flutter:
+    sdk: flutter
+  cupertino_icons: ^1.0.6
+
+  # Meme app dependencies
+  image_picker: ^1.1.0
+  path_provider: ^2.1.2
+  provider: ^6.1.2
+  http: ^1.2.1
+  flutter_staggered_grid_view: ^0.7.0
+  share_plus: ^8.0.2
+  google_fonts: ^6.2.1
+
+dev_dependencies:
+  flutter_test:
+    sdk: flutter
+  flutter_lints: ^3.0.1
+
+flutter:
+  uses-material-design: true
