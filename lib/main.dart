@@ -19,10 +19,11 @@ class _MyAppState extends State<MyApp> {
 
   void _toggleTheme() {
     setState(() {
-      _themeMode =
-      _themeMode == ThemeMode.light ? ThemeMode.dark : ThemeMode.light;
+      _themeMode = _themeMode == ThemeMode.light ? ThemeMode.dark : ThemeMode.light;
     });
   }
+
+  final GlobalKey<MemeFeedPageState> _feedKey = GlobalKey<MemeFeedPageState>();
 
   @override
   Widget build(BuildContext context) {
@@ -31,14 +32,16 @@ class _MyAppState extends State<MyApp> {
       theme: ThemeData.light(),
       darkTheme: ThemeData.dark(),
       themeMode: _themeMode,
-      home: HomePage(onToggleTheme: _toggleTheme),
+      home: HomePage(toggleTheme: _toggleTheme, feedKey: _feedKey),
     );
   }
 }
 
 class HomePage extends StatefulWidget {
-  final VoidCallback onToggleTheme;
-  const HomePage({super.key, required this.onToggleTheme});
+  final VoidCallback toggleTheme;
+  final GlobalKey<MemeFeedPageState> feedKey;
+
+  const HomePage({super.key, required this.toggleTheme, required this.feedKey});
 
   @override
   State<HomePage> createState() => _HomePageState();
@@ -46,20 +49,32 @@ class HomePage extends StatefulWidget {
 
 class _HomePageState extends State<HomePage> {
   int _currentIndex = 0;
+  late final List<Widget> _pages;
 
   @override
-  Widget build(BuildContext context) {
-    final List<Widget> _pages = [
-      MemeFeedPage(onToggleTheme: widget.onToggleTheme),
+  void initState() {
+    super.initState();
+    _pages = [
+      MemeFeedPage(key: widget.feedKey, toggleTheme: widget.toggleTheme),
       const MessagesPage(),
       const ProfilePage(),
     ];
+  }
 
+  @override
+  Widget build(BuildContext context) {
     return Scaffold(
       body: _pages[_currentIndex],
       bottomNavigationBar: BottomNavigationBar(
         currentIndex: _currentIndex,
-        onTap: (index) => setState(() => _currentIndex = index),
+        onTap: (index) {
+          if (_currentIndex == index && index == 0) {
+            widget.feedKey.currentState?.manualRefresh();
+          }
+          setState(() {
+            _currentIndex = index;
+          });
+        },
         items: const [
           BottomNavigationBarItem(icon: Icon(Icons.home), label: 'Feed'),
           BottomNavigationBarItem(icon: Icon(Icons.message), label: 'Messages'),

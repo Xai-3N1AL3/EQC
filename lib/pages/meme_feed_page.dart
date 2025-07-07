@@ -3,16 +3,17 @@ import '../models/reddit_meme.dart';
 import '../services/meme_api.dart';
 
 class MemeFeedPage extends StatefulWidget {
-  const MemeFeedPage({super.key});
+  final VoidCallback toggleTheme;
+  const MemeFeedPage({super.key, required this.toggleTheme});
 
   @override
-  State<MemeFeedPage> createState() => _MemeFeedPageState();
+  State<MemeFeedPage> createState() => MemeFeedPageState();
 }
 
-class _MemeFeedPageState extends State<MemeFeedPage> {
+class MemeFeedPageState extends State<MemeFeedPage> {
   late Future<List<RedditMeme>> futureMemes;
   final GlobalKey<RefreshIndicatorState> _refreshKey = GlobalKey<RefreshIndicatorState>();
-  final Set<String> _likedMemes = {}; // Store liked meme titles or ids
+  final Set<String> _likedMemes = {};
 
   @override
   void initState() {
@@ -26,7 +27,7 @@ class _MemeFeedPageState extends State<MemeFeedPage> {
     });
   }
 
-  Future<void> _manualRefresh() async {
+  Future<void> manualRefresh() async {
     _fetchMemes();
   }
 
@@ -37,8 +38,8 @@ class _MemeFeedPageState extends State<MemeFeedPage> {
         title: const Text('Meme Feed'),
         actions: [
           IconButton(
-            icon: const Icon(Icons.refresh),
-            onPressed: _manualRefresh,
+            icon: const Icon(Icons.brightness_6),
+            onPressed: widget.toggleTheme,
           ),
         ],
       ),
@@ -54,17 +55,15 @@ class _MemeFeedPageState extends State<MemeFeedPage> {
           }
 
           final memes = snapshot.data!;
-
           return RefreshIndicator(
             key: _refreshKey,
-            onRefresh: _manualRefresh,
+            onRefresh: manualRefresh,
             child: ListView.builder(
               key: const PageStorageKey('memeFeed'),
               itemCount: memes.length,
               itemBuilder: (context, index) {
                 final meme = memes[index];
                 final isLiked = _likedMemes.contains(meme.title);
-
                 return Card(
                   margin: const EdgeInsets.all(8),
                   child: Column(
